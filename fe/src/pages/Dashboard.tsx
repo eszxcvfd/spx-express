@@ -7,7 +7,16 @@ import {
   ShoppingCart, Warehouse, Package, Truck,
   ClipboardList, AlertTriangle
 } from 'lucide-react';
-import { p01Api, p02Api, p03Api, p04Api, p05Api, p06Api, inventoryApi } from '../services/api';
+import { p01Api, p02Api, p03Api, p04Api, p05Api, p06Api, inventoryApi, inventoryCheckApi } from '../services/api';
+import {
+  PurchaseOrderStatus,
+  InboundStatus,
+  OutboundStatus,
+  PackingStatus,
+  SortingStatus,
+  ShippingStatus,
+  InventoryCheckStatus,
+} from '../types/canonical';
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6'];
 
@@ -40,6 +49,9 @@ export default function Dashboard() {
     pendingInbound: 0,
     pendingOutbound: 0,
     pendingPacking: 0,
+    pendingSorting: 0,
+    pendingShipment: 0,
+    pendingInventoryCheck: 0,
     inTransit: 0,
     lowStock: 0,
   });
@@ -48,13 +60,14 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [orders, inbounds, outbounds, packings, _sortings, shipments, inventory] = await Promise.all([
-          p01Api.getOrders({ status: 'PENDING_APPROVAL' }),
-          p02Api.getInbounds({ status: 'P02_INBOUND_CREATED' }),
-          p03Api.getOutbounds({ status: 'PENDING' }),
-          p04Api.getPackings({ status: 'PENDING' }),
-          p05Api.getSortings({ status: 'PENDING' }),
-          p06Api.getShipments({ status: 'IN_TRANSIT' }),
+        const [orders, inbounds, outbounds, packings, sortings, shipments, checks, inventory] = await Promise.all([
+          p01Api.getOrders({ status: PurchaseOrderStatus.PENDING_APPROVAL }),
+          p02Api.getInbounds({ status: InboundStatus.INBOUND_CREATED }),
+          p03Api.getOutbounds({ status: OutboundStatus.ORDER_RECEIVED }),
+          p04Api.getPackings({ status: PackingStatus.PENDING }),
+          p05Api.getSortings({ status: SortingStatus.PENDING }),
+          p06Api.getShipments({ status: ShippingStatus.IN_TRANSIT }),
+          inventoryCheckApi.getChecks({ status: InventoryCheckStatus.PENDING }),
           inventoryApi.getAll(),
         ]);
 
@@ -67,6 +80,9 @@ export default function Dashboard() {
           pendingInbound: (inbounds as { total: number }).total || 0,
           pendingOutbound: (outbounds as { total: number }).total || 0,
           pendingPacking: (packings as { total: number }).total || 0,
+          pendingSorting: (sortings as { total: number }).total || 0,
+          pendingShipment: (shipments as { total: number }).total || 0,
+          pendingInventoryCheck: (checks as { total: number }).total || 0,
           inTransit: (shipments as { total: number }).total || 0,
           lowStock,
         });
@@ -80,13 +96,13 @@ export default function Dashboard() {
   }, []);
 
   const chartData = [
-    { name: 'P01 Đặt hàng', value: stats.pendingOrders, color: '#6366f1' },
-    { name: 'P02 Nhập kho', value: stats.pendingInbound, color: '#8b5cf6' },
-    { name: 'P03 Xuất kho', value: stats.pendingOutbound, color: '#ec4899' },
-    { name: 'P04 Đóng gói', value: stats.pendingPacking, color: '#f43f5e' },
-    { name: 'P05 Phân loại', value: 0, color: '#f97316' },
-    { name: 'P06 Vận chuyển', value: stats.inTransit, color: '#eab308' },
-    { name: 'P07 Kiểm kê', value: 0, color: '#22c55e' },
+    { name: 'Đặt hàng', value: stats.pendingOrders, color: '#6366f1' },
+    { name: 'Nhập kho', value: stats.pendingInbound, color: '#8b5cf6' },
+    { name: 'Xuất kho', value: stats.pendingOutbound, color: '#ec4899' },
+    { name: 'Đóng gói', value: stats.pendingPacking, color: '#f43f5e' },
+    { name: 'Phân loại', value: stats.pendingSorting, color: '#f97316' },
+    { name: 'Vận chuyển', value: stats.pendingShipment, color: '#eab308' },
+    { name: 'Kiểm kê', value: stats.pendingInventoryCheck, color: '#22c55e' },
   ];
 
   if (loading) {

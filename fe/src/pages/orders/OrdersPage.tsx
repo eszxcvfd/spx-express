@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Plus, Search, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
-import { p01Api } from '../../services/api';
-import { PurchaseOrder, PurchaseOrderStatus } from '../../types';
+import { p01Api, type CreateOrderRequest } from '../../services/api';
+import { PurchaseOrder } from '../../types';
+import { PurchaseOrderStatus } from '../../types/canonical';
 import { useAuth } from '../../context/AuthContext';
 import StatusBadge from '../../components/StatusBadge';
 import CreateOrderModal from '../../components/CreateOrderModal';
@@ -112,7 +113,7 @@ export default function OrdersPage() {
     try {
       setActionError('');
       setIsCreating(true);
-      await p01Api.createOrder(payload as unknown as Record<string, unknown>);
+      await p01Api.createOrder(payload as CreateOrderRequest);
       setIsCreateModalOpen(false);
       await fetchOrders();
     } catch (err) {
