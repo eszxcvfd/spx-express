@@ -1,4 +1,5 @@
 import { EventType, EventPayload } from './types.js';
+import { enqueueEvent, TxClient } from './outbox.js';
 import prisma from '../config/db.js';
 
 class EventEmitter {
@@ -19,10 +20,11 @@ class EventEmitter {
     entityType: string,
     entityId: string,
     data: Record<string, unknown> = {},
-    userId?: string
+    userId?: string,
+    tx?: TxClient
   ): Promise<void> {
-    const process = eventType.split('_')[0]; // First word as process ID
-    
+    const process = eventType.split('_')[0];
+
     const payload: EventPayload = {
       eventType,
       process,
@@ -33,24 +35,21 @@ class EventEmitter {
       timestamp: new Date().toISOString(),
     };
 
-    // Log to database
-    await prisma.eventLog.create({
-      data: {
-        eventType,
-        process,
-        entityType,
-        entityId,
-        userId,
-        payload: payload as unknown as Record<string, JSON>,
-      },
-    });
+    await enqueueEvent(eventType, entityType, entityId, payload as unknown as Record<string, unknown>, tx);
 
     console.log(`[EVENT] ${eventType} - ${entityType}:${entityId}`);
   }
 
   async getEvents(process?: string, limit = 100) {
-    return prisma.eventLog.findMany({
+    return (prisma as any).eventLog.findMany({
       where: process ? { process } : undefined,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  }
+
+  async getOutboxEvents(limit = 100) {
+    return (prisma as any).outbox.findMany({
       orderBy: { createdAt: 'desc' },
       take: limit,
     });
