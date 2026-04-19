@@ -1,173 +1,106 @@
-body {
-  background-color: #f3f4f6;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --color-canvas: #f8fafc;
+  --color-surface: #ffffff;
+  --color-navy: #0f172a;
+  --color-cobalt: #2563eb;
+  --color-emerald: #10b981;
+  --color-ruby: #ef4444;
+  --color-whisper: rgba(226, 232, 240, 0.8);
+
+  --radius-premium: 1rem;
+  --radius-tactile: 0.75rem;
+
+  --shadow-premium: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  body {
+    @apply bg-canvas text-navy font-sans antialiased;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
 }
 
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.15s;
+@layer components {
+  /* Redefine existing manual classes to use design tokens */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-95;
+    border-radius: var(--radius-tactile);
+  }
+
+  .btn-primary {
+    @apply bg-navy text-white hover:bg-slate-800 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-100 text-slate-700 hover:bg-slate-200;
+  }
+
+  .btn-accent {
+    @apply bg-cobalt text-white hover:bg-blue-700 shadow-sm;
+  }
+
+  .btn-success {
+    @apply bg-emerald text-white hover:bg-emerald-600;
+  }
+
+  .btn-danger {
+    @apply bg-ruby text-white hover:bg-red-600;
+  }
+
+  .card {
+    @apply bg-surface shadow-premium border border-whisper overflow-hidden;
+    border-radius: var(--radius-premium);
+  }
+
+  .input {
+    @apply w-full px-4 py-2 bg-surface border border-slate-200 transition-all outline-none focus:ring-2 focus:ring-cobalt/20 focus:border-cobalt;
+    border-radius: var(--radius-tactile);
+  }
+
+  .table {
+    @apply w-full text-left border-collapse;
+  }
+
+  .table th {
+    @apply px-4 py-3 bg-slate-50/50 font-semibold text-slate-600 border-b border-whisper text-sm uppercase tracking-wider;
+  }
+
+  .table td {
+    @apply px-4 py-4 border-b border-slate-50 text-sm;
+  }
+
+  .table tr:hover {
+    @apply bg-slate-50/30;
+  }
+
+  /* Status Badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-cobalt { @apply bg-blue-50 text-blue-700 border border-blue-100; }
+  .badge-emerald { @apply bg-emerald-50 text-emerald-700 border border-emerald-100; }
+  .badge-ruby { @apply bg-red-50 text-red-700 border border-red-100; }
+
+  /* Premium Utilities */
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+
+  .tactile {
+    @apply transition-transform duration-200 active:scale-95 active:translate-y-0.5;
+  }
 }
 
-.btn-primary {
-  background-color: #1e293b;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #334155;
-}
-
-.btn-secondary {
-  background-color: #e5e7eb;
-  color: #1f2937;
-}
-
-.btn-secondary:hover {
-  background-color: #d1d5db;
-}
-
-.btn-success {
-  background-color: #16a34a;
-  color: white;
-}
-
-.btn-danger {
-  background-color: #dc2626;
-  color: white;
-}
-
-.card {
-  background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  border: 1px solid #f3f4f6;
-}
-
-.input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  outline: none;
-}
-
-.input:focus {
-  border-color: #1e293b;
-  box-shadow: 0 0 0 2px rgba(30, 41, 59, 0.2);
-}
-
-.table {
-  width: 100%;
-  text-align: left;
-  border-collapse: collapse;
-}
-
-.table th {
-  padding: 0.75rem 1rem;
-  background-color: #f9fafb;
-  font-weight: 500;
-  color: #374151;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.table tr:hover {
-  background-color: #f9fafb;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Utility classes */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.gap-2 { gap: 0.5rem; }
-.gap-3 { gap: 0.75rem; }
-.gap-4 { gap: 1rem; }
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
-.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.mr-2 { margin-right: 0.5rem; }
-.ml-2 { margin-left: 0.5rem; }
-.mt-4 { margin-top: 1rem; }
-.space-y-4 > * + * { margin-top: 1rem; }
-.space-y-6 > * + * { margin-top: 1.5rem; }
-.w-full { width: 100%; }
-.h-screen { height: 100vh; }
-.min-h-screen { min-height: 100vh; }
-.text-center { text-align: center; }
-.text-sm { font-size: 0.875rem; }
-.text-lg { font-size: 1.125rem; }
-.text-xl { font-size: 1.25rem; }
-.text-2xl { font-size: 1.5rem; }
-.font-medium { font-weight: 500; }
-.font-bold { font-weight: 700; }
-.text-gray-500 { color: #6b7280; }
-.text-gray-600 { color: #4b5563; }
-.text-gray-700 { color: #374151; }
-.text-gray-800 { color: #1f2937; }
-.text-gray-900 { color: #111827; }
-.text-white { color: white; }
-.text-red-600 { color: #dc2626; }
-.bg-white { background-color: white; }
-.bg-gray-50 { background-color: #f9fafb; }
-.bg-gray-100 { background-color: #f3f4f6; }
-.bg-gray-200 { background-color: #e5e7eb; }
-.bg-slate-800 { background-color: #1e293b; }
-.rounded { border-radius: 0.25rem; }
-.rounded-lg { border-radius: 0.5rem; }
-.rounded-xl { border-radius: 0.75rem; }
-.rounded-full { border-radius: 9999px; }
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-.border { border-width: 1px; }
-.border-b { border-bottom-width: 1px; }
-.border-gray-200 { border-color: #e5e7eb; }
-.border-gray-100 { border-color: #f3f4f6; }
-.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.grid { display: grid; }
-.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-
-@media (min-width: 768px) {
-  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-@media (min-width: 1024px) {
-  .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-@media (max-width: 767px) {
-  .md\:grid-cols-2 { grid-template-columns: 1fr; }
-  .lg\:grid-cols-4 { grid-template-columns: 1fr; }
-}
+/* Remove manual utility classes as Tailwind provides them better */
+/* We keep the ones that might be specifically used in the current code but map them to Tailwind if possible */
